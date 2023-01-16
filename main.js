@@ -6,6 +6,7 @@ ASSET_MANAGER.queueDownload("./duckies.png")
 ASSET_MANAGER.queueDownload("./duckroll.png")
 
 ASSET_MANAGER.queueDownload("./Forest.png")
+ASSET_MANAGER.queueDownload("./tombstone.png")
 
 ASSET_MANAGER.downloadAll(() => {
 	var canvas = document.getElementById("gameWorld");

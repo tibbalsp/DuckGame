@@ -7,6 +7,7 @@ class SceneManager{
 
         this.player = new CharacterController(this.game,50,550);
 
+        this.elapsedTime =0;
 
 
 
@@ -29,7 +30,9 @@ class SceneManager{
        //this.player = (new CharacterController(gameEngine),50,550)
 
        this.game.addEntity(this.player);
+       this.game.addEntity(new Tombstone(this.game,1920,700))
        this.game.addEntity(new Background(this.game));
+       
 
 
 
@@ -38,8 +41,16 @@ class SceneManager{
 
     update() {
         let midpoint = params.canvasWidth/2;
+        this.elapsedTime += this.game.clockTick;
+        this.game.addEntity(new Tombstone(this.game,1920,700))
+        if(this.elapsedTime == 3){
+            this.elapsedTime=0;
+            console.log("make another")
+            
 
-        if (this.x < this.player.x - midpoint) this.x = this.player.x  - midpoint;
+        }
+
+        //if (this.x < this.player.x - midpoint) this.x = this.player.x  - midpoint;
 
 
 
