@@ -1,4 +1,6 @@
 class SceneManager{
+    
+
     constructor(game){
         this.game = game;
         this.game.camera = this;
@@ -9,8 +11,10 @@ class SceneManager{
 
         this.elapsedTime =0;
 
-
-
+        this.spawns = [0.5,1,3,5];
+        this.randomSpawn = 0;
+        
+        this.Spawn();
         this.loadLevel(50,550);
 
     };
@@ -30,23 +34,41 @@ class SceneManager{
        //this.player = (new CharacterController(gameEngine),50,550)
 
        this.game.addEntity(this.player);
-       this.game.addEntity(new Tombstone(this.game,1920,700))
-       this.game.addEntity(new Background(this.game));
+       //this.game.addEntity(new Tombstone(this.game,1920,700))
+       
        
 
 
 
 
     };
+    
+    Spawn(){
+        this.prevSpawn = this.randomSpawn;
+        
+        while(this.prevSpawn === this.randomSpawn){
+            this.randomSpawn = Math.floor(Math.random() * this.spawns.length);
+        }
+
+
+
+        
+
+    };
 
     update() {
         let midpoint = params.canvasWidth/2;
         this.elapsedTime += this.game.clockTick;
-        this.game.addEntity(new Tombstone(this.game,1920,700))
-        if(this.elapsedTime == 3){
+
+        
+
+
+        //this.game.addEntity(new Tombstone(this.game,1920,700))
+        if(this.elapsedTime > this.spawns[this.randomSpawn]){
             this.elapsedTime=0;
+            this.Spawn();
             console.log("make another")
-            
+            this.game.addEntity(new Tombstone(this.game,1920,700))
 
         }
 
@@ -57,7 +79,7 @@ class SceneManager{
     };
 
     draw(ctx){
-        //ctx.drawImage(ASSET_MANAGER.getAsset("./background.png"),0,0);
+       
     };
 
 };

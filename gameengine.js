@@ -14,6 +14,7 @@ class GameEngine {
         this.mouse = null;
         this.wheel = null;
         this.keys = {};
+        this.background = new Background(this,)
 
         // Options and the Details
         this.options = options || {
@@ -87,15 +88,19 @@ class GameEngine {
     draw() {
         // Clear the whole canvas with transparent color (rgba(0, 0, 0, 0))
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.background.draw(this.ctx)
 
         // Draw latest things first
         for (let i = this.entities.length - 1; i >= 0; i--) {
             this.entities[i].draw(this.ctx, this);
         }
+
     };
 
     update() {
         let entitiesCount = this.entities.length;
+
+        this.background.update(this.ctx)
 
         for (let i = 0; i < entitiesCount; i++) {
             let entity = this.entities[i];

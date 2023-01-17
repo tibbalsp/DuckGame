@@ -14,9 +14,9 @@ class CharacterController {
         this.speed = 100;
         this.velocity = { x: 0, y: 0 };
 
-        this.gravity = 150;
+        this.gravity =  220;
         this.facingDirection = 0;
-        this.state = 0;
+        this.state = "IDLE";
         this.dead = false;
 
 
@@ -25,62 +25,94 @@ class CharacterController {
         this.animationList = [];
         this.getAnimations;
         this.game.addEntity(new Background(this.game));
+        this.elapsedTime =0;
+        this.totalTime = 5 * 0.2;
+
 
    
         //(Idle)
-        this.animationList[0] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,6.2,0.2,0);  
+        this.animationList["IDLE"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,6.2,0.2,0);  
         //Walk
-        this.animationList[1] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,145,72,72,8,0.4,1);
+        this.animationList["WALK"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,145,72,72,8,0.4,1);
         //Jump
-        this.animationList[2] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,6,0.27,0);
+        this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
         //Roll
-        this.animationList[3] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
+        this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
 
 
     };
 
-    updateBB(){
+    updateBB(frame){
         this.lastBB = this.BB;
-        this.BB = new BoundingBox(this.x+40 , this.y+8 , 56, 68*2);
         
 
+        if(this.state =="WALK" || this.state == "IDLE"){
+           
+            
+            this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
+        
+        }else if(this.state == "JUMP"){            
+            this.elapsedTime += this.game.clockTick;
 
+            const frame = this.currentFrame( this.elapsedTime , 0.22);
+            console.log(frame);
 
+            if(frame==1){
+                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
+            }else if(frame==2){
+                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
+            }else if(frame==3){
+                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
+            }else if(frame==4){
+                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
+            }else if(frame >= 5){
+                this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
+            }
+
+        }
+     
+    };
+    currentFrame(elapsedTime, frameDuration){
+        return Math.floor(elapsedTime / frameDuration);
     };
 
     update(){   
-        const MAXRUN = 50;
+        const MAXRUN = 100;
         
         if(this.y > 600) {
             this.y=600;
+            this.elapsedTime = 0
+
             this.velocity.y = 0;
-            this.animationList[2] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,6,0.27,0);
+            this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
 
-            this.state = 1;
+            this.state = "WALK";
         };
 
-        if(this.game.keys["w"] && this.state != 2){
-                this.state = 2;
+        if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
+                this.state = "JUMP";
                 this.velocity.x += 0;
-                this.velocity.y -= 150;
-                this.animationList[2] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,6,0.27,0);
+                this.velocity.y -= 175;
+                this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
         };
 
-        if(this.game.keys["Space"] && this.state != 2){
-            this.state = 2;
+        if(this.game.keys["Space"] && this.state != "JUMP" && this.state != "ROLL"){
+            this.state = "JUMP";
             this.velocity.x += 0;
             this.velocity.y -= 200;
-            this.animationList[2] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,6,0.27,0);
-
+            this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
    
         };
         if(this.game.keys["s"]){
-            this.state = 3;
+            this.state = "ROLL";
         
         };
         
 
         if(this.game.keys["d"]){
+            if(this.velocity.x < 0){
+                this.velocity.x = 0
+            }
             if(this.velocity.x > MAXRUN){
                 this.velocity.x = MAXRUN;
             }else{
@@ -88,6 +120,10 @@ class CharacterController {
         };
 
         if(this.game.keys["a"]){
+
+            if(this.velocity.x > 0){
+                this.velocity.x = 0
+            }
 
             if(this.velocity.x < -MAXRUN){
                 this.velocity.x = -MAXRUN;
@@ -106,7 +142,8 @@ class CharacterController {
         }else{
             this.x += this.velocity.x*this.game.clockTick;
         }
-        
+        this.updateBB();
+
         this.x += this.velocity.x*this.game.clockTick;
         this.y += this.velocity.y*this.game.clockTick;
         
@@ -124,7 +161,6 @@ class CharacterController {
             
             }
         })
-    
 
     };
 
@@ -139,6 +175,12 @@ class CharacterController {
     
             ctx.strokeStyle = 'Red';
             ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        }else{
+
+//For new game eventually            
+            this.game.entities = [];
+            this.game.addEntity(new SceneManager(gameEngine));
+            
         }
 
     };

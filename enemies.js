@@ -4,7 +4,7 @@ class Tombstone {
 
         this.x=x;
         this.y=y;
-        this.velocity = { x: -5.0, y:0};
+        this.velocity = { x: -3.0, y:0};
         this.spritesheet = ASSET_MANAGER.getAsset("./tombstone.png");
 
         this.updateBB();

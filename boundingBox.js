@@ -26,6 +26,12 @@ class BoundingBox{
         ctx.strokeStyle = "Red";
         ctx.lineWidth = 3;
         ctx.strokeRect(this.x,this.y,this.width,this.height);
+
+//        ctx.beginPath();
+ //       ctx.arc(100, 75, 50, 0, 2 * Math.PI);
+ //       ctx.stroke();
     }
+
+      
 
 }
