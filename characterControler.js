@@ -48,14 +48,13 @@ class CharacterController {
 
         if(this.state =="WALK" || this.state == "IDLE"){
            
-            
             this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
         
         }else if(this.state == "JUMP"){            
             this.elapsedTime += this.game.clockTick;
 
             const frame = this.currentFrame( this.elapsedTime , 0.22);
-            console.log(frame);
+            //console.log(frame);
 
             if(frame==1){
                 this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
@@ -69,6 +68,33 @@ class CharacterController {
                 this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
             }
 
+        }else if(this.state == "ROLL"){
+           // console.log("roll")
+            this.elapsedTime += this.game.clockTick;
+            const frame = this.currentFrame( this.elapsedTime , 0.1);
+
+            if(frame==1){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==2){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==3){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==4){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==5){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==6){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==7){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==8){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame==9){
+                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
+            }else if(frame > 9){
+                this.elapsedTime = 0;
+            }
+            
         }
      
     };
@@ -80,13 +106,17 @@ class CharacterController {
         const MAXRUN = 100;
         
         if(this.y > 600) {
+            if(this.state=="JUMP"){
+                this.state="WALK";
+            }
             this.y=600;
-            this.elapsedTime = 0
-
             this.velocity.y = 0;
             this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
-
-            this.state = "WALK";
+            if(!this.game.keys["s"]){
+                this.elapsedTime = 0
+                this.state = "WALK";
+                
+            }
         };
 
         if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
@@ -103,9 +133,10 @@ class CharacterController {
             this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
    
         };
-        if(this.game.keys["s"]){
+        if(this.game.keys["s"] && this.state != "JUMP" && this.state != "ROLL"){
             this.state = "ROLL";
-        
+            this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
+
         };
         
 
@@ -157,6 +188,7 @@ class CharacterController {
                     if(entity instanceof Tombstone){
                         console.log("I am dead")
                     }
+                    
                 
             
             }
@@ -177,9 +209,9 @@ class CharacterController {
             ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
         }else{
 
-//For new game eventually            
-            this.game.entities = [];
-            this.game.addEntity(new SceneManager(gameEngine));
+//For new game eventually
+            //this.game.enemies.speed = 0;
+            this.game.background.speed =0;
             
         }
 
