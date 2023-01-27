@@ -33,7 +33,7 @@ class CharacterController {
         //(Idle)
         this.animationList["IDLE"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,6.2,0.2,0);  
         //Walk
-        this.animationList["WALK"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,145,72,72,8,0.4,1);
+        this.animationList["WALK"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,145,72,72,8,0.2,1);
         //Jump
         this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
         //Roll
