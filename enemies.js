@@ -33,8 +33,8 @@ class Tombstone {
 
     draw(ctx){
         ctx.drawImage(this.spritesheet, this.x ,this.y, 50, 50);
-        ctx.strokeStyle = 'Red';
-        ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+    //    ctx.strokeStyle = 'Red';
+    //    ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
     }
 
 }
@@ -85,8 +85,8 @@ class Dog{
 
     draw(ctx){
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
-        ctx.strokeStyle = 'Red';
-        ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+      //  ctx.strokeStyle = 'Red';
+      //  ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
     }
 
 

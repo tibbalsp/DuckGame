@@ -209,8 +209,8 @@ class CharacterController {
             //ctx.lineWidth = 5;
             //ctx.strokeRect(this.x+40 , this.y+8 , 56, 68*2);
     
-            ctx.strokeStyle = 'Red';
-            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+         //   ctx.strokeStyle = 'Red';
+         //   ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
         }else{
 
 //For new game eventually
