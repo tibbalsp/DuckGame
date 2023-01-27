@@ -18,15 +18,8 @@ class Menu{
         if(this.game.click && this.game.click.y > 520 && this.game.click.y < 560){
             this.game.click.y = 0;
             console.log("highscores")
-
-
       }
-      
-
-
-
-
-        
+    
     };
     
     draw(ctx){ 

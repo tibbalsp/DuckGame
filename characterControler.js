@@ -14,7 +14,7 @@ class CharacterController {
         this.speed = 100;
         this.velocity = { x: 0, y: 0 };
 
-        this.gravity =  220;
+        this.gravity =  300;
         this.facingDirection = 0;
         this.state = "IDLE";
         this.dead = false;
@@ -122,14 +122,14 @@ class CharacterController {
         if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
                 this.state = "JUMP";
                 this.velocity.x += 0;
-                this.velocity.y -= 175;
+                this.velocity.y -= 200;
                 this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
         };
 
         if(this.game.keys["Space"] && this.state != "JUMP" && this.state != "ROLL"){
             this.state = "JUMP";
             this.velocity.x += 0;
-            this.velocity.y -= 200;
+            this.velocity.y -= 250;
             this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
    
         };
@@ -147,7 +147,7 @@ class CharacterController {
             if(this.velocity.x > MAXRUN){
                 this.velocity.x = MAXRUN;
             }else{
-            this.velocity.x += 50*this.game.clockTick};
+            this.velocity.x += 100*this.game.clockTick};
         };
 
         if(this.game.keys["a"]){
@@ -159,7 +159,7 @@ class CharacterController {
             if(this.velocity.x < -MAXRUN){
                 this.velocity.x = -MAXRUN;
             }else{
-            this.velocity.x -= 50*this.game.clockTick};
+            this.velocity.x -= 100*this.game.clockTick};
         }  
 
         this.velocity.y += this.gravity*this.game.clockTick;
@@ -188,7 +188,11 @@ class CharacterController {
                     if(entity instanceof Tombstone){
                         console.log("I am dead")
                     }
-                    
+                    if(entity instanceof Dog){
+                        
+                        that.game.camera.addPoints(50)
+                        
+                    }
                 
             
             }
@@ -212,6 +216,8 @@ class CharacterController {
 //For new game eventually
             //this.game.enemies.speed = 0;
             this.game.background.speed =0;
+            this.game.camera.clearEntities();
+            this.game.addEntity(new RetryMenu(this.game, this.game.camera.score));
             
         }
 

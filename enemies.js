@@ -50,6 +50,7 @@ class Dog{
         this.speed = 0.5;
         this.updateBB();
         this.animation = new Animator(this.spritesheet,0,0,52,38,3,0.3,1);
+        this.updateScore=0;
         
 
     }
@@ -69,7 +70,6 @@ class Dog{
                     if(entity.state == "ROLL"){
                         that.removeFromWorld = true;
                         
-
                     }else{
                         entity.dead = true;
                     }
@@ -78,6 +78,8 @@ class Dog{
             }
         });
 
+        this.game.camera.score += this.updateScore;
+        this.updateScore =0;
     
     }
 

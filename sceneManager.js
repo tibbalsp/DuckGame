@@ -14,7 +14,7 @@ class SceneManager{
         this.scoreTime = 0;
 
         this.graveSpawns = [0.5,1,3,5];
-        this.dogSpawns =[3,5,7];
+        this.dogSpawns =[5,7,11];
         this.randomGraveSpawn = 0;
         this.randomDogSpawn = 0;
         this.GraveSpawn();
@@ -44,7 +44,11 @@ class SceneManager{
 
 
     };
-    
+    addPoints(p) {
+        this.scoreTime += p;
+        this.draw(this.game.ctx)
+    };
+
     GraveSpawn(){
         this.prevGraveSpawn = this.randomGraveSpawn;
         
@@ -60,7 +64,11 @@ class SceneManager{
             this.randomDogSpawn = Math.floor(Math.random() * this.dogSpawns.length);
         }
     };
-
+    clearEntities() {
+        this.game.entities.forEach(function (entity) {
+            entity.removeFromWorld = true;
+        });
+    };
 
     update() {
         let midpoint = params.canvasWidth/2;
@@ -75,19 +83,12 @@ class SceneManager{
             console.log("make tombstone")
             this.game.addEntity(new Tombstone(this.game,1920,700))
         }
-        if(this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
+        if(this.scoreTime > 50 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
             this.elapsedDogTime=0;
             this.DogSpawn();
             console.log("make dog")
             this.game.addEntity(new Dog(this.game,-50,675))
         }
-
-        //this.game.addEntity(new Dog(this.game,-50,675))
-
-
-        //if (this.x < this.player.x - midpoint) this.x = this.player.x  - midpoint;
-
-
 
     };
 
@@ -95,11 +96,6 @@ class SceneManager{
 
 
         if(this.player.dead==true){
-            ctx.font =  '60px "a"'
-            ctx.fillStyle = "RED";
-            this.score = Math.floor(this.scoreTime);
-            ctx.fillText("FATALITY", 600 ,350);
-            ctx.fillText("SCORE:"+this.score+" ", 600 ,400);
 
         }else{
             this.scoreTime += this.game.clockTick;
