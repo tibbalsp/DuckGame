@@ -40,7 +40,6 @@ class Menu{
         ctx.strokeStyle = 'RED';
         ctx.font =  '48px ""'
         ctx.fillText("Play", 625,515);
-        ctx.fillText("High Scores - In Dev",625,560)
         if ((this.game.mouse && this.game.mouse.y > 475 && this.game.mouse.y < 515)) {
             ctx.fillStyle = 'Yellow';
             ctx.font =  '64px ""';

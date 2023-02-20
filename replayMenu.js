@@ -12,7 +12,7 @@ class RetryMenu{
         if(this.game.click && this.game.click.y > 450 && this.game.click.y < 500){
             this.game.click.y = 0;
             this.game.camera.clearEntities();
-            this.game.background.speed = 5;
+            this.game.background.halt = false;
             this.game.addEntity(new SceneManager(this.game)); 
         }
     

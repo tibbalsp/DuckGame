@@ -21,6 +21,7 @@ class Background{
         console.log(stop);
     }
     draw(ctx){
+        
         ctx.drawImage(ASSET_MANAGER.getAsset("./assets/Spooky Cemetery Collapsed.png"), this.x ,this.y, 1920, 768);
         ctx.drawImage(ASSET_MANAGER.getAsset("./assets/Spooky Cemetery Collapsed.png"), this.x+1919, this.y, 1920, 768);
 

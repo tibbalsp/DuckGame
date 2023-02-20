@@ -33,7 +33,7 @@ class SceneManager{
         if(this.bgm == null){
             this.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
             ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
-           // this.bgm.play();
+            this.bgm.play();
         }
        //this.player = (new CharacterController(gameEngine),50,550)
       
@@ -75,10 +75,10 @@ class SceneManager{
 
     update() {
 
-        if(this.score >= 10){
+        if(this.score >= 500){
             console.log("hello")
             this.game.background.updateSpeed(true);
-            
+
         }else{
 
             this.elapsedGraveTime += this.game.clockTick;
@@ -92,7 +92,7 @@ class SceneManager{
                 console.log("make tombstone")
                 this.game.addEntity(new Tombstone(this.game,1920,610))
             }
-            if(this.scoreTime > 20 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
+            if(this.scoreTime > 10 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
                 this.elapsedDogTime=0;
                 this.DogSpawn();
                 console.log("make dog")
