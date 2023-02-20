@@ -9,7 +9,6 @@ class RetryMenu{
 
     update(){
         
-
         if(this.game.click && this.game.click.y > 450 && this.game.click.y < 500){
             this.game.click.y = 0;
             this.game.camera.clearEntities();

@@ -4,7 +4,26 @@
 <head>
     <meta charset="utf-8">
     <title> Duck Run </title>
-  
+    <style>
+        body {
+            background-color:lightgreen;
+            font-family: 'Baskerville',serif ;
+            font-size: 28px;
+        }
+        canvas {
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            font-size: 14px;
+            color: black;
+            
+        }
+        div {
+            text-align: center;
+        }
+    </style>
     <script type="text/javascript" src="./assetmanager.js"></script>
     <script type="text/javascript" src="./timer.js"></script>
     <script type="text/javascript" src="./background.js"></script>
@@ -24,8 +43,14 @@
 
 </head>
 <body>
-    <canvas id="gameWorld" width="1444" height="768" style="background: white; border: 1px solid black" tabindex="0" autofocus></canvas>
-    <h3> A-Left....D-Right....W-Small Jump....SpaceBar-Big Jump</h3>
-    <h3> S-Roll----Use to kill dogs</h3>
+    <canvas id="gameWorld" width="1444" height="768" style="background: black; border: 1px solid black" tabindex="0" autofocus></canvas>
+
+    <div>
+        <br />
+        <h3> A-Left....D-Right....W-Small Jump....SpaceBar-Big Jump</h3>
+        <h3> S-Roll----Use to squish dogs</h3>    
+        <br>
+    </div>
+
 </body>
 </html>

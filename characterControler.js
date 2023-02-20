@@ -18,83 +18,45 @@ class CharacterController {
         this.facingDirection = 0;
         this.state = "IDLE";
         this.dead = false;
-
+        this.stoppedBackground = false;
 
         this.updateBB();
         
         this.animationList = [];
         this.getAnimations;
-        this.game.addEntity(new Background(this.game));
-        this.elapsedTime =0;
+        this.elapsedTime = 0;
         this.totalTime = 5 * 0.2;
 
-
+        this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
    
+       // spritesheet, xStart, yStart, width, height, frameCount, frameDuration, loop, spriteBorderWidth=0, xoffset=0, yoffset=0, scale=1, rowCount=1, lineEnd, rowOffset=0
         //(Idle)
-        this.animationList["IDLE"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,6.2,0.2,0);  
+        this.animationList["IDLE"] = new Animator(this.spriteSheet,0,0,32,32,1,1,1,0,0,0,4);  
         //Walk
-        this.animationList["WALK"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,145,72,72,8,0.2,1);
+        this.animationList["WALK"] = new Animator(this.spriteSheet,0,0,32,32,5,0.1,1,0,0,0,4);
         //Jump
-        this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+        this.animationList["JUMP"] = new Animator(this.spriteSheet,0,32,32,32,5,0.05,1,0,0,0,4);
         //Roll
-        this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
+        this.animationList["ROLL"] = new Animator(this.spriteSheet,0,64,32,32,3,0.1,1,0,0,0,4);
 
-
+        this.runSound = ASSET_MANAGER.getAsset("./assets/running.mp3")
+        ASSET_MANAGER.autoRepeat("./assets/running.mp3")
+        this.rollSound = ASSET_MANAGER.getAsset("./assets/running.mp3")
+        ASSET_MANAGER.autoRepeat("./assets/running.mp3")
     };
 
     updateBB(frame){
         this.lastBB = this.BB;
         
 
-        if(this.state =="WALK" || this.state == "IDLE"){
+        if(this.state =="WALK" || this.state == "IDLE"|| this.state == "JUMP"){
            
-            this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
-        
-        }else if(this.state == "JUMP"){            
-            this.elapsedTime += this.game.clockTick;
-
-            const frame = this.currentFrame( this.elapsedTime , 0.22);
-            //console.log(frame);
-
-            if(frame==1){
-                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
-            }else if(frame==2){
-                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
-            }else if(frame==3){
-                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
-            }else if(frame==4){
-                this.BB = new BoundingBox(this.x+42 , this.y+8 , 10, 66*2);
-            }else if(frame >= 5){
-                this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*2);
-            }
-
+            this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*1.7);
         }else if(this.state == "ROLL"){
            // console.log("roll")
             this.elapsedTime += this.game.clockTick;
             const frame = this.currentFrame( this.elapsedTime , 0.1);
-
-            if(frame==1){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==2){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==3){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==4){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==5){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==6){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==7){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==8){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame==9){
-                this.BB = new BoundingBox(this.x+42 , this.y+28 , 52, 51*2);
-            }else if(frame > 9){
-                this.elapsedTime = 0;
-            }
-            
+            this.BB = new BoundingBox(this.x+42 , this.y+56 , 52, 51*1.35);
         }
      
     };
@@ -104,38 +66,48 @@ class CharacterController {
 
     update(){   
         const MAXRUN = 100;
-        
-        if(this.y > 600) {
+        if(this.game.camera.score >= 10){
+            this.stoppedBackground = true;
+        }
+        if(this.y > 560) {
             if(this.state=="JUMP"){
-                this.state="WALK";
+              
+                    this.state="WALK";
+                
+                //this.rollSound.pause();
+                //this.runSound.play();
             }
-            this.y=600;
+            this.y=560;
             this.velocity.y = 0;
-            this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
             if(!this.game.keys["s"]){
                 this.elapsedTime = 0
                 this.state = "WALK";
-                
+               // this.rollSound.pause();
+                //this.runSound.play();
             }
         };
 
         if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
-                this.state = "JUMP";
-                this.velocity.x += 0;
-                this.velocity.y -= 200;
-                this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+           // this.runSound.pause();
+            this.state = "JUMP";
+            this.velocity.x += 0;
+            this.velocity.y -= 200;
+            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
         };
 
         if(this.game.keys["Space"] && this.state != "JUMP" && this.state != "ROLL"){
+           // this.runSound.pause();
             this.state = "JUMP";
             this.velocity.x += 0;
             this.velocity.y -= 250;
-            this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
    
         };
         if(this.game.keys["s"] && this.state != "JUMP" && this.state != "ROLL"){
             this.state = "ROLL";
-            this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
+           // this.rollSound.play();
+            //this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
 
         };
         
@@ -209,8 +181,8 @@ class CharacterController {
             //ctx.lineWidth = 5;
             //ctx.strokeRect(this.x+40 , this.y+8 , 56, 68*2);
     
-         //   ctx.strokeStyle = 'Red';
-         //   ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+            ctx.strokeStyle = 'Red';
+            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
         }else{
 
 //For new game eventually

@@ -2,8 +2,7 @@ class Menu{
     constructor(game, x, y) {
         Object.assign(this, { game});
         this.game = game;
-        
-
+        this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
 
     };
 
@@ -24,7 +23,7 @@ class Menu{
     
     draw(ctx){ 
 
-        ctx.drawImage(ASSET_MANAGER.getAsset("./Forest.png"), 0,0, 1920, 768,);
+        ctx.drawImage(ASSET_MANAGER.getAsset("./assets/Spooky Cemetery Collapsed.png"), 0,0, 1920, 768,);
 
         const offsetX = 400;
         const offsetY = 600
@@ -44,13 +43,13 @@ class Menu{
         ctx.fillText("High Scores - In Dev",625,560)
         if ((this.game.mouse && this.game.mouse.y > 475 && this.game.mouse.y < 515)) {
             ctx.fillStyle = 'Yellow';
-            ctx.font =  '64px ""'
-            ctx.drawImage(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,585,470,48,48)
+            ctx.font =  '64px ""';
+            ctx.drawImage(this.spriteSheet,0,0,32,32,585,470,48,48)
         }
         if ((this.game.mouse && this.game.mouse.y > 520 && this.game.mouse.y < 560)) {
             ctx.fillStyle = 'Yellow';
             ctx.font =  '64px ""'
-            ctx.drawImage(ASSET_MANAGER.getAsset("./duckies.png"),0,0,72,72,585,515,48,48)
+            ctx.drawImage(this.spriteSheet,0,0,32,32,585,470,48,48)
         }
         
 

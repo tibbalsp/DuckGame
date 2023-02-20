@@ -14,7 +14,7 @@ class GameEngine {
         this.mouse = null;
         this.wheel = null;
         this.keys = {};
-        this.background = new Background(this,)
+        this.background = new Background(this)
 
         // Options and the Details
         this.options = options || {

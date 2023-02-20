@@ -8,7 +8,7 @@ class SceneManager{
         this.score = 0;
 
         this.player = new CharacterController(this.game,50,550);
-
+       
         this.elapsedGraveTime = 0;
         this.elapsedDogTime = 0;
         this.scoreTime = 0;
@@ -20,7 +20,7 @@ class SceneManager{
         this.GraveSpawn();
         this.DogSpawn();
         this.loadLevel(50,550);
-
+        this.bgm = null;
     };
 
 
@@ -30,16 +30,19 @@ class SceneManager{
         this.player.x = x;
         this.player.y = y;
         this.player.velocity = { x: 0, y: 0 };
-        
-
-
+        if(this.bgm == null){
+            this.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
+            ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
+           // this.bgm.play();
+        }
        //this.player = (new CharacterController(gameEngine),50,550)
+      
 
        this.game.addEntity(this.player);
        //this.game.addEntity(new Tombstone(this.game,1920,700))
        
        
-
+ 
 
 
 
@@ -71,25 +74,31 @@ class SceneManager{
     };
 
     update() {
-        let midpoint = params.canvasWidth/2;
-        this.elapsedGraveTime += this.game.clockTick;
-        this.elapsedDogTime += this.game.clockTick;
 
-        
-        //this.game.addEntity(new Tombstone(this.game,1920,700))
-        if(this.elapsedGraveTime > this.graveSpawns[this.randomGraveSpawn]&& this.player.dead==false){
-            this.elapsedGraveTime=0;
-            this.GraveSpawn();
-            console.log("make tombstone")
-            this.game.addEntity(new Tombstone(this.game,1920,700))
-        }
-        if(this.scoreTime > 50 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
-            this.elapsedDogTime=0;
-            this.DogSpawn();
-            console.log("make dog")
-            this.game.addEntity(new Dog(this.game,-50,675))
-        }
+        if(this.score >= 10){
+            console.log("hello")
+            this.game.background.updateSpeed(true);
+            
+        }else{
 
+            this.elapsedGraveTime += this.game.clockTick;
+            this.elapsedDogTime += this.game.clockTick;
+
+            
+            //this.game.addEntity(new Tombstone(this.game,1920,700))
+            if(this.elapsedGraveTime > this.graveSpawns[this.randomGraveSpawn]&& this.player.dead==false){
+                this.elapsedGraveTime=0;
+                this.GraveSpawn();
+                console.log("make tombstone")
+                this.game.addEntity(new Tombstone(this.game,1920,610))
+            }
+            if(this.scoreTime > 20 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
+                this.elapsedDogTime=0;
+                this.DogSpawn();
+                console.log("make dog")
+                this.game.addEntity(new Dog(this.game,-50,620))
+            }
+        }
     };
 
     draw(ctx){

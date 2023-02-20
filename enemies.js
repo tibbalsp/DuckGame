@@ -4,14 +4,14 @@ class Tombstone {
         this.x=x;
         this.y=y;
         this.velocity = { x: 0, y:0};
-        this.spritesheet = ASSET_MANAGER.getAsset("./tombstone.png");
+        this.spritesheet = ASSET_MANAGER.getAsset("./assets/Headstone.png");
         this.speed = -5;
         this.updateBB();
 
     }
     updateBB() {
         this.lastBB = this.BB;
-        this.BB = new BoundingBox(this.x+4, this.y , 42, 50);
+        this.BB = new BoundingBox(this.x+15, this.y+25 , 42, 50);
     };
 
     update(){
@@ -32,9 +32,9 @@ class Tombstone {
     }
 
     draw(ctx){
-        ctx.drawImage(this.spritesheet, this.x ,this.y, 50, 50);
-    //    ctx.strokeStyle = 'Red';
-    //    ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        ctx.drawImage(this.spritesheet, this.x ,this.y, 75, 75);
+        ctx.strokeStyle = 'Red';
+        ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
     }
 
 }
@@ -46,17 +46,17 @@ class Dog{
         this.x=x;
         this.y=y;
         this.velocity = { x: 0, y:0};
-        this.spritesheet = ASSET_MANAGER.getAsset("./dog.png");
+        this.spritesheet = ASSET_MANAGER.getAsset("./assets/dog.png");
         this.speed = 0.5;
         this.updateBB();
-        this.animation = new Animator(this.spritesheet,0,0,52,38,3,0.3,1);
+        this.animation = new Animator(this.spritesheet,0,0,52,38,3,0.2,1,0,0,0,2);
         this.updateScore=0;
         
 
     }
     updateBB(){
         this.lastBB = this.BB;
-        this.BB = new BoundingBox(this.x+8, this.y+5 , 52, 60);
+        this.BB = new BoundingBox(this.x+8, this.y+10 , 52, 55);
     }
 
     update(){
@@ -85,8 +85,8 @@ class Dog{
 
     draw(ctx){
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y);
-      //  ctx.strokeStyle = 'Red';
-      //  ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        ctx.strokeStyle = 'Red';
+        ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
     }
 
 
