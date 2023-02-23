@@ -18,7 +18,6 @@ class Background{
     }
     updateSpeed(stop){
         this.halt = stop;
-        console.log(stop);
     }
     draw(ctx){
         

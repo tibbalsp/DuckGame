@@ -8,10 +8,15 @@ ASSET_MANAGER.queueDownload("./assets/running.mp3")
 ASSET_MANAGER.queueDownload("./assets/roll.mp3")
 ASSET_MANAGER.queueDownload("./assets/level1.mp3")
 ASSET_MANAGER.queueDownload("./assets/boss.mp3")
-
+ASSET_MANAGER.queueDownload("./assets/fireball.png")
+ASSET_MANAGER.queueDownload("./assets/reaper.png")
 ASSET_MANAGER.queueDownload("./assets/Cross.png")
 ASSET_MANAGER.queueDownload("./assets/Headstone.png")
 ASSET_MANAGER.queueDownload("./assets/dog.png")
+
+ASSET_MANAGER.queueDownload("./assets/Duck Sprite Sheet Damaged.png")
+ASSET_MANAGER.queueDownload("./assets/duckAttack.png")
+ASSET_MANAGER.queueDownload("./assets/reaperDamaged.png")
 
 ASSET_MANAGER.downloadAll(() => {
 	var canvas = document.getElementById("gameWorld");

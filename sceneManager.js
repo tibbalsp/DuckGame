@@ -1,9 +1,10 @@
 class SceneManager{
     
 
-    constructor(game){
+    constructor(game,difficulty){
         this.game = game;
         this.game.camera = this;
+        this.game.difficulty = difficulty;
         this.x = 0;
         this.score = 0;
 
@@ -17,10 +18,24 @@ class SceneManager{
         this.dogSpawns =[5,7,11];
         this.randomGraveSpawn = 0;
         this.randomDogSpawn = 0;
+        this.bossSwitchTime =0;
         this.GraveSpawn();
         this.DogSpawn();
         this.loadLevel(50,550);
         this.bgm = null;
+        this.dogCount = 0;
+        this.grimCount = 0;
+        this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
+        this.bossScore = 0;
+        if(difficulty == "EASY"){
+            this.bossScore = 200;
+        }else if(difficulty == "NORMAL"){
+            this.bossScore = 500;
+        }else if(difficulty == "HARD"){
+            this.bossScore = 750;
+        }else if(difficulty == "HARDCORE"){
+            this.bossScore = 1000;
+        }
     };
 
 
@@ -33,10 +48,11 @@ class SceneManager{
         if(this.bgm == null){
             this.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
             ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
-            this.bgm.play();
+            if(!this.game.mute){
+                this.bgm.play();
+            }
         }
        //this.player = (new CharacterController(gameEngine),50,550)
-      
 
        this.game.addEntity(this.player);
        //this.game.addEntity(new Tombstone(this.game,1920,700))
@@ -72,13 +88,20 @@ class SceneManager{
             entity.removeFromWorld = true;
         });
     };
-
+    GrimSpawn(){
+        if(this.grimCount < 1){
+            this.game.addEntity(new Grim(this.game, 1300,-100));
+            this.grimCount++;
+        }
+    }
     update() {
+        if(this.score >= this.bossScore){
+            this.bossSwitchTime += this.game.clockTick;
+            this.GrimSpawn();
+            if(this.bossSwitchTime > 10){
+                this.game.background.updateSpeed(true);
 
-        if(this.score >= 500){
-            console.log("hello")
-            this.game.background.updateSpeed(true);
-
+            }
         }else{
 
             this.elapsedGraveTime += this.game.clockTick;
@@ -92,7 +115,8 @@ class SceneManager{
                 console.log("make tombstone")
                 this.game.addEntity(new Tombstone(this.game,1920,610))
             }
-            if(this.scoreTime > 10 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
+             
+            if(this.score > 10 && this.elapsedDogTime > this.dogSpawns[this.randomDogSpawn]&& this.player.dead==false){
                 this.elapsedDogTime=0;
                 this.DogSpawn();
                 console.log("make dog")
@@ -107,6 +131,12 @@ class SceneManager{
         if(this.player.dead==true){
 
         }else{
+
+            for(let i = 0 ; i < this.player.lives;i++){
+                ctx.drawImage(this.spriteSheet,0,0,32,32,0+32*i,0,48,48)
+            }
+            
+
             this.scoreTime += this.game.clockTick;
          //   console.log(this.scoreTime);
             //this.score = this.game.clockTick;

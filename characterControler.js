@@ -17,32 +17,64 @@ class CharacterController {
         this.gravity =  300;
         this.facingDirection = 0;
         this.state = "IDLE";
+        this.lives =0;
+        if(this.game.difficulty=="EASY"){
+            this.lives = 10;
+
+        }else if(this.game.difficulty=="NORMAL"){
+            this.lives = 5;
+
+        }else if(this.game.difficulty=="HARD"){
+            this.lives = 3;
+
+        }else if(this.game.difficulty=="HARDCORE"){
+            this.lives = 0;
+
+        }
+        this.damaged = false;
         this.dead = false;
+        this.damageTimeout = 0;
+        
+
         this.stoppedBackground = false;
 
         this.updateBB();
         this.facingDirection = 1;
         this.animationList = [];
-        this.getAnimations;
-        this.elapsedTime = 0;
-        this.totalTime = 5 * 0.2;
 
+        this.elapsedTime = 0;
+        //this.totalTime = 5 * 0.2;
+
+        
+        this.regularList = [];
         this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
-   
-       // spritesheet, xStart, yStart, width, height, frameCount, frameDuration, loop, spriteBorderWidth=0, xoffset=0, yoffset=0, scale=1, rowCount=1, lineEnd, rowOffset=0
         //(Idle)
-        this.animationList["IDLE"] = new Animator(this.spriteSheet,0,0,32,32,1,1,1,0,0,0,4);  
+        this.regularList["IDLE"] = new Animator(this.spriteSheet,0,0,32,32,1,1,1,0,0,0,4);  
         //Walk
-        this.animationList["WALK"] = new Animator(this.spriteSheet,0,0,32,32,5,0.1,1,0,0,0,4);
+        this.regularList["WALK"] = new Animator(this.spriteSheet,0,0,32,32,5,0.1,1,0,0,0,4);
         //Jump
-        this.animationList["JUMP"] = new Animator(this.spriteSheet,0,32,32,32,5,0.05,1,0,0,0,4);
+        this.regularList["JUMP"] = new Animator(this.spriteSheet,0,32,32,32,5,0.05,1,0,0,0,4);
         //Roll
-        this.animationList["ROLL"] = new Animator(this.spriteSheet,0,64,32,32,3,0.1,1,0,0,0,4);
+        this.regularList["ROLL"] = new Animator(this.spriteSheet,0,64,32,32,3,0.1,1,0,0,0,4);
+        
+        this.damagedList = [];
+        this.damagedSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet Damaged.png");
+        //(Idle)
+        this.damagedList["IDLE"] = new Animator(this.damagedSheet,0,0,32,32,1,1,1,0,0,0,4);  
+        //Walk
+        this.damagedList["WALK"] = new Animator(this.damagedSheet,0,0,32,32,5,0.1,1,0,0,0,4);
+        //Jump
+        this.damagedList["JUMP"] = new Animator(this.damagedSheet,0,32,32,32,5,0.05,1,0,0,0,4);
+        //Roll
+        this.damagedList["ROLL"] = new Animator(this.damagedSheet,0,64,32,32,3,0.1,1,0,0,0,4);
 
         this.runSound = ASSET_MANAGER.getAsset("./assets/running.mp3")
         ASSET_MANAGER.autoRepeat("./assets/running.mp3")
         this.rollSound = ASSET_MANAGER.getAsset("./assets/roll.mp3")
         ASSET_MANAGER.autoRepeat("./assets/roll.mp3")
+
+        this.animationList = this.regularList;
+
     };
 
     updateBB(frame){
@@ -64,132 +96,211 @@ class CharacterController {
         return Math.floor(elapsedTime / frameDuration);
     };
 
+    switchAnimation(){
+        if(this.animationList == this.damagedList){
+            console.log("switched to reg")
+
+            this.animationList = this.regularList;
+        }else{
+            console.log("switched to flash")
+
+            this.animationList = this.damagedList;
+        }
+    }
     update(){   
         const MAXRUN = 100;
-        if(this.game.camera.score >= 500){
-            this.stoppedBackground = true;
+        if(this.damaged){
+            this.damageTimeout += this.game.clockTick;
+            if(this.damageTimeout > 3){
+                this.damaged = false;
+                this.switchAnimation();
+            }
         }
-        if(this.y > 560) {
-            if(this.state=="JUMP"){
-                if(this.stoppedBackground){
-                    this.state = "IDLE";
-                }else{
-                    this.state="WALK";
-                    this.runSound.play();
-                }
-            }
-            this.y=560;
-            this.velocity.y = 0;
-            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
-            if(!this.game.keys["s"]){
-                this.rollSound.pause();
-                this.elapsedTime = 0
-                if(this.stoppedBackground){
-                    this.state = "IDLE";
-                }else{
-                    this.state="WALK";
-                    this.runSound.play();
-                }
-            }
-        };
-
-        if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
-            this.runSound.pause();
-            this.state = "JUMP";
-            this.velocity.x += 0;
-            this.velocity.y -= 200;
-            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
-        };
-
-        if(this.game.keys["Space"] && this.state != "JUMP" && this.state != "ROLL"){
-            this.runSound.pause();
-            this.state = "JUMP";
-            this.velocity.x += 0;
-            this.velocity.y -= 250;
-            //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
-   
-        };
-        if(this.game.keys["s"] && this.state != "JUMP" && this.state != "ROLL"){
-            this.state = "ROLL";
-            this.runSound.pause();
-            this.rollSound.play();
-            //this.animationList["ROLL"] = new Animator(ASSET_MANAGER.getAsset("./duckroll.png"),0,0,72,72,8,.1,1);
-
-        };
-        
-
-        if(this.game.keys["d"]){
-            if(this.stoppedBackground){
-                this.facingDirection = 1;
-                if(this.state == "IDLE"){
-                    this.state = "WALK"
-                    this.runSound.play();
-                }
-            }
-            
-            
-            if(this.velocity.x < 0){
-                this.velocity.x = 0
-            }
-            if(this.velocity.x > MAXRUN){
-                this.velocity.x = MAXRUN;
-            }else{
-            this.velocity.x += 100*this.game.clockTick};
-        };
-
-        if(this.game.keys["a"]){
-            if(this.stoppedBackground){
-                this.facingDirection = 0;
-                if(this.state == "IDLE"){
-                    this.state = "WALK"
-                    this.runSound.play();
-
-                }
-            }
-            if(this.velocity.x > 0){
-                this.velocity.x = 0
-            }
-            if(this.velocity.x < -MAXRUN){
-                this.velocity.x = -MAXRUN;
-            }else{
-            this.velocity.x -= 100*this.game.clockTick};
-        }  
-
-        this.velocity.y += this.gravity*this.game.clockTick;
-        
-        if(this.x<20){
-            this.x = 20
-            this.velocity.x = 0;
-        }else if(this.x > 1300){
-            this.x = 1300;
-            this.velocity.x = 0;
+       
+        if(this.lives < 0){
+            this.dead = true;
         }else{
-            this.x += this.velocity.x*this.game.clockTick;
-        }
-        this.updateBB();
 
-        this.x += this.velocity.x*this.game.clockTick;
-        this.y += this.velocity.y*this.game.clockTick;
-        
-        this.updateBB();
-
-        //Collisions
-        var that = this;
-        that.game.entities.forEach(function (entity) {    
-            if(that != entity && entity.BB && that.BB.collide(entity.BB)){
-                
-                    if(entity instanceof Tombstone){
-                        console.log("I am dead")
-                    }
-                    if(entity instanceof Dog){
-                        
-                        that.game.camera.addPoints(50)
-                        
-                    }
-                
-            
+            if(this.game.camera.bossSwitchTime >= 10){
+                this.stoppedBackground = true;
             }
-        })
+    
+
+            if(this.y > 560) {
+                if(this.state=="JUMP"){
+                    if(this.stoppedBackground && !this.game.keys["d"] && !this.game.keys["a"]){
+                        this.state = "IDLE";
+                        this.velocity.x = 0;
+                    }else{
+                        this.state="WALK";
+                        if(!this.game.mute){
+                            this.runSound.play();
+                        }
+                    }
+                }
+                this.y=560;
+                this.velocity.y = 0;
+                //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+                
+                if(this.stoppedBackground && this.state=="WALK" && !this.game.keys["d"] && !this.game.keys["a"]){
+                    this.state ="IDLE";
+                    this.velocity.x = 0;
+                }
+
+
+                if(!this.game.keys["s"]){
+                    if(!this.game.mute){
+                        this.rollSound.pause();
+                    }
+                    
+                    this.elapsedTime = 0
+                    if(this.stoppedBackground && this.state !="WALK"){
+                        this.state = "IDLE";
+
+                    }else{
+                        this.state="WALK";
+                        if(!this.game.mute){
+                            this.runSound.play();
+                        }                    }
+                }
+
+            };
+
+            if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
+                if(!this.game.mute){
+                    this.runSound.pause();
+                }
+                this.state = "JUMP";
+                this.velocity.y -= 250;
+            };
+
+
+            if(this.game.keys["s"]  && this.state != "ROLL"){
+                if(this.state == "JUMP"){
+                    this.velocity.y +=15;
+                }else{
+                    this.state = "ROLL";
+                    if(!this.game.mute){
+                        this.runSound.pause();
+                        this.rollSound.play();
+                    }
+                    
+                }
+
+
+            };
+            
+
+            if(this.game.keys["d"]){
+                if(this.stoppedBackground){
+                    this.facingDirection = 1;
+                    if(this.state == "IDLE"){
+                        this.state = "WALK"
+                        if(!this.game.mute){
+                            this.runSound.play();
+                        }
+                    }
+                }
+                
+                
+                if(this.velocity.x < 0){
+                    this.velocity.x = 0
+                }
+                if(this.velocity.x > MAXRUN){
+                    this.velocity.x = MAXRUN;
+                }else{
+                    if(this.stoppedBackground){
+                        this.velocity.x += 400*this.game.clockTick;
+                    }else{
+                        this.velocity.x += 100*this.game.clockTick;
+                    }
+                }
+            };
+
+            if(this.game.keys["a"]){
+                if(this.stoppedBackground){
+                    this.facingDirection = 0;
+                    if(this.state == "IDLE"){
+                        this.state = "WALK"
+                        if(!this.game.mute){
+                            this.runSound.play();
+                        }
+
+                    }
+                }
+                if(this.velocity.x > 0){
+                    this.velocity.x = 0
+                }
+                if(this.velocity.x < -MAXRUN){
+                    this.velocity.x = -MAXRUN;
+                }else{
+                this.velocity.x -= 100*this.game.clockTick};
+            }  
+
+            this.velocity.y += this.gravity*this.game.clockTick;
+            
+            if(this.x<20){
+                this.x = 20
+                this.velocity.x = 0;
+            }else if(this.x > 1300){
+                this.x = 1300;
+                this.velocity.x = 0;
+            }else{
+                this.x += this.velocity.x*this.game.clockTick;
+            }
+            this.updateBB();
+
+            this.x += this.velocity.x*this.game.clockTick;
+            this.y += this.velocity.y*this.game.clockTick;
+            
+            this.updateBB();
+
+            //Collisions
+            console.log(this.damaged)
+            var that = this;
+            this.game.entities.forEach(function (entity) {    
+                if(that != entity && that.damaged==false && entity.BB && that.BB.collide(entity.BB)){
+                        
+                        if(entity instanceof Tombstone){
+                            console.log("tombstone")
+                            that.switchAnimation();
+                            that.damaged = true;
+                            that.damageTimeout = 0;
+                        }
+                        if(entity instanceof Dog && that.state != "ROLL"){
+                            console.log("dog")
+                            that.switchAnimation();
+                            that.damaged = true;
+                            that.lives -= 1;
+                            that.damageTimeout = 0;
+                            
+                        }if(entity instanceof Grim ){
+                            console.log("grim")
+                            if(entity.damaged==1){
+                                
+                            }
+                            console.log(entity.damaged)
+                            if(that.lastBB.bottom < entity.BB.top && entity.damaged==0){
+                                that.velocity.y -= 250;
+                                that.y -=150;
+                            }else{
+                                that.switchAnimation();
+                                that.damaged = true;
+                                that.lives -= 1;
+                                that.damageTimeout = 0;
+                            }
+                    
+                        }
+                        if(entity instanceof FireBall){
+                            that.switchAnimation();
+                            that.damaged = true;
+                            that.damageTimeout = 0;
+                        }
+                    
+                
+                }
+            })
+        }
 
     };
 
@@ -197,6 +308,9 @@ class CharacterController {
     draw(ctx) {
 
         if(this.dead === false){
+
+
+
             ctx.save();
             let destx = this.x;
             let desty = this.y;
