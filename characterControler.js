@@ -115,6 +115,7 @@ class CharacterController {
         this.preVeloY = this.velocity.y;   
         const FALL = 1575;
         const MAXRUN = 400;
+        
         this.hover = false;
 
         if(this.game.keys["Escape"]){
@@ -192,9 +193,7 @@ class CharacterController {
                     this.state = "JUMP";
                     this.fallAcc = this.gravity;
                     this.velocity.y -= this.jumpSpeed*20*this.game.clockTick;
-                    this.hover = true;
                 }else{
-                    
                     this.hover = true;
                 }
             };
@@ -273,15 +272,15 @@ class CharacterController {
 
             this.x += this.velocity.x*this.game.clockTick;
 
-            if (this.velocity.y + this.fallAcc * this.game.clockTick > 0) { // jump
-                //console.log(this.fallAcc,this.y)
-                if(this.hover){
-                    this.fallAcc = this.gravity;
-                }else{
-                    this.fallAcc = FALL;
-                }
+            if (this.velocity.y < 0 && this.preVeloY <= 0) { // jump
+                this.hover = true;
             }
-        
+
+            if(this.hover){
+                this.fallAcc = this.gravity;
+            }else{
+                this.fallAcc = FALL;
+            }
 
             this.velocity.y += this.fallAcc * this.game.clockTick;
            // console.log(this.velocity.y+"   "+this.preVeloY)
