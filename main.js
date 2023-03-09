@@ -3,6 +3,7 @@ var gameEngine = new GameEngine();
 const ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("./assets/Spooky Cemetery Collapsed.png")
+ASSET_MANAGER.queueDownload("./assets/hellgate.png")
 ASSET_MANAGER.queueDownload("./assets/Duck Sprite Sheet.png")
 ASSET_MANAGER.queueDownload("./assets/running.mp3")
 ASSET_MANAGER.queueDownload("./assets/roll.mp3")
@@ -17,6 +18,8 @@ ASSET_MANAGER.queueDownload("./assets/dog.png")
 ASSET_MANAGER.queueDownload("./assets/Duck Sprite Sheet Damaged.png")
 ASSET_MANAGER.queueDownload("./assets/duckAttack.png")
 ASSET_MANAGER.queueDownload("./assets/reaperDamaged.png")
+
+
 
 ASSET_MANAGER.downloadAll(() => {
 	var canvas = document.getElementById("gameWorld");

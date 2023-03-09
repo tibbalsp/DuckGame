@@ -26,9 +26,11 @@ class Tombstone {
     }
 
     draw(ctx){
-        ctx.drawImage(this.spritesheet, this.x ,this.y, 75, 75);
-        ctx.strokeStyle = 'Red';
-        ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        ctx.drawImage(this.spritesheet, this.x ,this.y, 75, 75); 
+        if(this.BB != null && this.game.debug == true){
+            this.BB.draw(ctx)
+        }
+        
     }
 
 }
@@ -105,10 +107,8 @@ class Dog{
     
         this.animation.drawFrame(this.game.clockTick, ctx, destx, desty);
         ctx.restore();
-
-        if(this.BB != null){
-            ctx.strokeStyle = 'Red';
-            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        if(this.BB != null && this.game.debug == true){
+            this.BB.draw(ctx)
         }
     }
 
@@ -121,37 +121,49 @@ class Grim{
         this.game = game;
         this.x=x;
         this.y=y;
+  
+//        spritesheet, xStart, yStart, width, height, frameCount, frameDuration, loop , spriteBorderWidth, xoffset, yoffset, scale, rowCount, lineEnd, rowOffset
 
         this.grimSheet = ASSET_MANAGER.getAsset("./assets/reaper.png");
-        this.grimAnimation = new Animator(this.grimSheet,0,0,32,31,3,0.2,1,0,0,0,3);
-        this.damaged = 0;
+        this.grimAnimation = new Animator(this.grimSheet,0,0,32,31,3,0.2,1,0,0,0,4);
+        this.damaged = 1;
         this.grimSheetDamaged = ASSET_MANAGER.getAsset("./assets/reaperDamaged.png");
-        this.grimDamageAnimation = new Animator(this.grimSheetDamaged,0,0,32,31,6,0.2,1,0,0,0,3);
-        this.animation = this.grimAnimation;
+        this.grimDamageAnimation = new Animator(this.grimSheetDamaged,0,0,32,31,6,0.2,1,0,0,0,4);
+        this.animation = this.grimDamageAnimation;
 
+        this.startingFlag = true;
 
-        this.horizontalSpeed =150;
-        this.verticalSpeed = 50;
+        this.horizontalSpeed =250;
+        this.verticalSpeed = 150;
         this.dir=1;
         this.updateBB();
         this.facingDirection = 0;
         this.attack = false;
-        this.attackTime = 1;
+        this.attackTime = 0.75;
         this.elapsedFireball = 0;
         this.switchSides = 0;
         this.switchStart=true;
         this.health = 0;
+        this.maxHealth = 0;
         if(this.game.difficulty=="EASY"){
-            this.health = 30;
+            this.health = 50;
+            this.maxHealth = 50;
+
 
         }else if(this.game.difficulty=="NORMAL"){
-            this.health = 40;
+            this.health = 50;
+            this.maxHealth = 50;
+
 
         }else if(this.game.difficulty=="HARD"){
-            this.health = 60;
+            this.health = 100;
+            this.maxHealth = 100;
+
 
         }else if(this.game.difficulty=="HARDCORE"){
-            this.health = 80;
+            this.health = 100;
+            this.maxHealth = 100;
+
         }
 
     }
@@ -169,9 +181,12 @@ class Grim{
     switchAnimaion(){
         console.log("switched")
         if(this.animation == this.grimDamageAnimation){
+            this.damaged = 0;
             this.animation = this.grimAnimation;
         }else{
+            this.damaged = 1;
             this.animation = this.grimDamageAnimation;
+            
         }
     }
     update(){
@@ -180,6 +195,8 @@ class Grim{
 
         this.switchSide();
         if(this.switchSides>10){
+            this.verticalSpeed = 200;
+
             if(this.damaged == 0 && this.switchStart){
                 this.switchAnimaion();
                 this.switchStart= false;
@@ -187,27 +204,31 @@ class Grim{
             if(this.facingDirection == 0){
                 this.x -= this.horizontalSpeed*this.game.clockTick;
                 if(this.x < 50){
-                    this.x+10;
+                    this.x = 50;
                     this.facingDirection = 1;
                     this.switchSides = 0;
                         
-                    this.damaged = 0;
                     this.switchAnimaion();
                     this.switchStart=true;
+                    this.verticalSpeed = 50;
+
                 }
             }else{
                 this.x += this.horizontalSpeed*this.game.clockTick;
-                if(this.x > 1300){
-                    this.x-10;
+                if(this.x > 1400){
+                    this.x = 1400;
                     this.facingDirection = 0;
                     this.switchSides = 0;
-                    this.damaged = 0;
                     this.switchAnimaion();
                     this.switchStart=true;
-
+                    this.verticalSpeed = 50;
                 }
             }
+            if(this.y < 450){
+                this.dir = 1;
+            }
         }else{
+            console.log(                this.attackTime     )
             if(this.attack && this.attackTime < this.elapsedFireball){
                 if(Math.floor(this.y) == 515){
                     if(this.facingDirection == 0){
@@ -216,7 +237,7 @@ class Grim{
                         this.spawnFireBall(this.x,this.y,1);
                     }
                     this.elapsedFireball = 0;
-
+            
                 }else if(Math.floor(this.y) == 565){
                     if(this.facingDirection == 0){
                         this.spawnFireBall(this.x-510,this.y,0);
@@ -236,13 +257,18 @@ class Grim{
                 }
 
             }
+            if(this.y < 500){
+                this.dir = 1;
+            }
         }
-        if(this.y < 500){
-            this.dir = 1;
-
-        }else if(this.y > 630){
-            this.attack = true;
-
+    
+        if(this.y > 630){
+            if(this.startingFlag== true){
+                this.verticalSpeed = 50;
+                this.startingFlag=false;
+                this.attack = true;
+                this.switchAnimaion();
+            }
             this.dir = -1;
 
         }
@@ -251,16 +277,29 @@ class Grim{
         this.game.entities.forEach(function (entity) {
             if (that != entity && entity.BB && that.BB.collide(entity.BB)) {
                 if (entity instanceof CharacterController ) {
-                    if(entity.lastBB.bottom < that.BB.top && that.damaged == 0 && entity.damaged == 0){
+                    if(((entity.lastBB.bottom < that.BB.top) ) && that.damaged == 0 && !entity.damaged ){
+                        console.log("jump hit")
                         that.y += 20;
-                        that.damaged = 1;
                         that.switchSides += 10;
                         that.health -= 10;
-                        if(that.health<=0){
-                            that.removeFromWorld = true;
-                        }
+                       
                         that.switchAnimaion();
 
+                    }else if(entity.state == "ROLL" && that.damaged == 0 && !entity.damaged ){
+                        console.log("roll hit")
+
+                        that.switchSides += 10;
+                        that.health -= 10;
+                      
+                        entity.damaged = true;
+                        entity.damageTimeout = 0;
+                        entity.switchAnimation();
+                        that.switchAnimaion();
+                
+                    }
+                    if(that.health <= 0){
+                        that.game.camera.gameOver = true;
+                        that.removeFromWorld = true;
                     }
                 }
             }
@@ -276,9 +315,9 @@ class Grim{
     updateBB(){
         this.lastBB = this.BB;
         if(this.facingDirection == 0){
-            this.BB = new BoundingBox(this.x-34, this.y+8 , 44, 85);
+            this.BB = new BoundingBox(this.x-46, this.y+12 , 48, 105);
         }else{
-            this.BB = new BoundingBox(this.x+24, this.y+8 , 44, 85);
+            this.BB = new BoundingBox(this.x+34, this.y+12 , 48, 105);
         }
     }
 
@@ -295,11 +334,29 @@ class Grim{
     
         this.animation.drawFrame(this.game.clockTick, ctx, destx, desty);
         ctx.restore();
+        ctx.save();
+        const width = this.BB.width | 1.5*this.maxHealth; // provide a default/standardized bar size.
+        const ratio = this.health / this.maxHealth;
 
-        if(this.BB != null){
-            ctx.strokeStyle = 'Red';
-            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        if (!this.facingDirection) {// if facing right
+            ctx.fillStyle="black"; // black background for empty health.
+            ctx.fillRect(this.x-55, this.y, width, 8);
+            ctx.fillStyle="#66161c"; // dark red for full health.
+            ctx.fillRect(this.x-55, this.y, Math.ceil(ratio*width), 8);
+        }else{
+            ctx.fillStyle="black"; // black background for empty health.
+            ctx.fillRect(this.x+25, this.y, width, 8);
+            ctx.fillStyle="#66161c"; // dark red for full health.
+            ctx.fillRect(this.x+25, this.y, Math.ceil(ratio*width), 8);
         }
+
+        ctx.restore();
+        if(this.BB != null && this.game.debug == true){
+            this.BB.draw(ctx)
+        }
+
+      
+
     }
 }
 class FireBall{
@@ -356,10 +413,8 @@ class FireBall{
     
         this.fireAnimation.drawFrame(this.game.clockTick, ctx, destx, desty);
         ctx.restore();
-
-        if(this.BB != null){
-            ctx.strokeStyle = 'Red';
-            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+        if(this.BB != null && this.game.debug == true){
+            this.BB.draw(ctx)
         }
     }
 }

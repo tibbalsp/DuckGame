@@ -11,10 +11,13 @@ class CharacterController {
         this.x=0;
         this.y=500;
 
-        this.speed = 100;
+        this.speed = 800;
+        this.jumpSpeed = 1000;
         this.velocity = { x: 0, y: 0 };
+        this.gravity =  600;
+        this.fallAcc = this.gravity;
+        this.hover = false;
 
-        this.gravity =  300;
         this.facingDirection = 0;
         this.state = "IDLE";
         this.lives =0;
@@ -90,7 +93,6 @@ class CharacterController {
             const frame = this.currentFrame( this.elapsedTime , 0.1);
             this.BB = new BoundingBox(this.x+42 , this.y+56 , 52, 51*1.35);
         }
-     
     };
     currentFrame(elapsedTime, frameDuration){
         return Math.floor(elapsedTime / frameDuration);
@@ -107,8 +109,23 @@ class CharacterController {
             this.animationList = this.damagedList;
         }
     }
-    update(){   
-        const MAXRUN = 100;
+    update(){
+        this.runSound.volume = 0.07;
+        this.rollSound.volume = 0.07;
+        this.preVeloY = this.velocity.y;   
+        const FALL = 1575;
+        const MAXRUN = 400;
+        this.hover = false;
+
+        if(this.game.keys["Escape"]){
+            this.game.camera.clearEntities();
+            this.removeFromWorld = true;
+            if( this.game.bgm != null){
+                this.game.bgm.pause();
+            }
+            this.game.addEntity(new Menu(this.game));        
+        }        
+
         if(this.damaged){
             this.damageTimeout += this.game.clockTick;
             if(this.damageTimeout > 3){
@@ -127,6 +144,7 @@ class CharacterController {
     
 
             if(this.y > 560) {
+                this.fallAcc = this.gravity;
                 if(this.state=="JUMP"){
                     if(this.stoppedBackground && !this.game.keys["d"] && !this.game.keys["a"]){
                         this.state = "IDLE";
@@ -166,12 +184,19 @@ class CharacterController {
 
             };
 
-            if(this.game.keys["w"] && this.state != "JUMP" && this.state != "ROLL"){
-                if(!this.game.mute){
-                    this.runSound.pause();
+            if(this.game.keys["w"] && this.state != "ROLL"){
+                if(this.state != "JUMP" ){
+                    if(!this.game.mute){
+                        this.runSound.pause();
+                    }
+                    this.state = "JUMP";
+                    this.fallAcc = this.gravity;
+                    this.velocity.y -= this.jumpSpeed*20*this.game.clockTick;
+                    this.hover = true;
+                }else{
+                    
+                    this.hover = true;
                 }
-                this.state = "JUMP";
-                this.velocity.y -= 250;
             };
 
 
@@ -209,15 +234,10 @@ class CharacterController {
                 if(this.velocity.x > MAXRUN){
                     this.velocity.x = MAXRUN;
                 }else{
-                    if(this.stoppedBackground){
-                        this.velocity.x += 400*this.game.clockTick;
-                    }else{
-                        this.velocity.x += 100*this.game.clockTick;
-                    }
+                    this.velocity.x += this.speed*this.game.clockTick;
                 }
-            };
-
-            if(this.game.keys["a"]){
+                
+            }else if(this.game.keys["a"]){
                 if(this.stoppedBackground){
                     this.facingDirection = 0;
                     if(this.state == "IDLE"){
@@ -234,29 +254,43 @@ class CharacterController {
                 if(this.velocity.x < -MAXRUN){
                     this.velocity.x = -MAXRUN;
                 }else{
-                this.velocity.x -= 100*this.game.clockTick};
+                    this.velocity.x -= this.speed*this.game.clockTick;
+                }
             }  
 
-            this.velocity.y += this.gravity*this.game.clockTick;
             
-            if(this.x<20){
-                this.x = 20
+            
+            if(this.x<10){
+                this.x = 10
                 this.velocity.x = 0;
-            }else if(this.x > 1300){
-                this.x = 1300;
+            }else if(this.x > 1325){
+                this.x = 1325;
                 this.velocity.x = 0;
             }else{
-                this.x += this.velocity.x*this.game.clockTick;
+        
             }
             this.updateBB();
 
             this.x += this.velocity.x*this.game.clockTick;
+
+            if (this.velocity.y + this.fallAcc * this.game.clockTick > 0) { // jump
+                //console.log(this.fallAcc,this.y)
+                if(this.hover){
+                    this.fallAcc = this.gravity;
+                }else{
+                    this.fallAcc = FALL;
+                }
+            }
+        
+
+            this.velocity.y += this.fallAcc * this.game.clockTick;
+           // console.log(this.velocity.y+"   "+this.preVeloY)
             this.y += this.velocity.y*this.game.clockTick;
-            
+
             this.updateBB();
+         //   console.log(this.state);
 
             //Collisions
-            console.log(this.damaged)
             var that = this;
             this.game.entities.forEach(function (entity) {    
                 if(that != entity && that.damaged==false && entity.BB && that.BB.collide(entity.BB)){
@@ -265,6 +299,7 @@ class CharacterController {
                             console.log("tombstone")
                             that.switchAnimation();
                             that.damaged = true;
+                            that.lives -= 1;
                             that.damageTimeout = 0;
                         }
                         if(entity instanceof Dog && that.state != "ROLL"){
@@ -274,15 +309,26 @@ class CharacterController {
                             that.lives -= 1;
                             that.damageTimeout = 0;
                             
-                        }if(entity instanceof Grim ){
+                        }
+                        if(entity instanceof Grim ){
                             console.log("grim")
-                            if(entity.damaged==1){
-                                
-                            }
-                            console.log(entity.damaged)
-                            if(that.lastBB.bottom < entity.BB.top && entity.damaged==0){
+                            if(entity.damaged==1 && !that.damaged){
+                                that.switchAnimation();
+                                that.damaged = true;
+                                that.lives -= 1;
+                                that.damageTimeout = 0;
+                            }else if(that.lastBB.bottom < entity.BB.top && entity.damaged==0){
                                 that.velocity.y -= 250;
                                 that.y -=150;
+
+                            }else if(that.state == "ROLL" && entity.damaged == 0){
+                                if(that.lastBB.right < entity.lastBB.left){
+                                    that.x -=20;
+                                }else  if(that.lastBB.left > entity.lastBB.right){
+                                    that.x +=20;
+                                    
+                                }
+
                             }else{
                                 that.switchAnimation();
                                 that.damaged = true;
@@ -292,9 +338,10 @@ class CharacterController {
                     
                         }
                         if(entity instanceof FireBall){
-                            that.switchAnimation();
-                            that.damaged = true;
-                            that.damageTimeout = 0;
+                           that.switchAnimation();
+                           that.damaged = true;
+                           that.lives -= 1;
+                           that.damageTimeout = 0;
                         }
                     
                 
@@ -323,15 +370,16 @@ class CharacterController {
         
             this.animationList[this.state].drawFrame(this.game.clockTick, ctx, destx, desty);
             ctx.restore();
-
+            if(this.BB != null && this.game.debug == true){
+                this.BB.draw(ctx)
+            }
             //ctx.strokeStyle = "Red";
             //ctx.lineWidth = 5;
             //ctx.strokeRect(this.x+40 , this.y+8 , 56, 68*2);
     
-            ctx.strokeStyle = 'Red';
-            ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
+          //  ctx.strokeStyle = 'Red';
+         //   ctx.strokeRect(this.BB.x, this.BB.y, this.BB.width, this.BB.height);
         }else{
-            console.log("we made it")
             //For new game eventually
             //this.game.enemies.speed = 0;
             this.game.background.halt = true;

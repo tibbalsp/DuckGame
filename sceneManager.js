@@ -22,11 +22,13 @@ class SceneManager{
         this.GraveSpawn();
         this.DogSpawn();
         this.loadLevel(50,550);
-        this.bgm = null;
+        this.game.bgm = null;
         this.dogCount = 0;
         this.grimCount = 0;
         this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
         this.bossScore = 0;
+        this.gameOver = false;
+        
         if(difficulty == "EASY"){
             this.bossScore = 200;
         }else if(difficulty == "NORMAL"){
@@ -35,6 +37,8 @@ class SceneManager{
             this.bossScore = 750;
         }else if(difficulty == "HARDCORE"){
             this.bossScore = 1000;
+        }else if(difficulty == "ENDLESS"){
+            this.bossScore = Number.MAX_SAFE_INTEGER;
         }
     };
 
@@ -45,11 +49,13 @@ class SceneManager{
         this.player.x = x;
         this.player.y = y;
         this.player.velocity = { x: 0, y: 0 };
-        if(this.bgm == null){
-            this.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
+        if(this.game.bgm == null){
+            this.game.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
             ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
             if(!this.game.mute){
-                this.bgm.play();
+                this.game.bgm.play();
+            }else{
+                this.game.bgm.pause();
             }
         }
        //this.player = (new CharacterController(gameEngine),50,550)
@@ -84,17 +90,24 @@ class SceneManager{
         }
     };
     clearEntities() {
+       
         this.game.entities.forEach(function (entity) {
             entity.removeFromWorld = true;
         });
+        this.removeFromWorld = true;
     };
     GrimSpawn(){
         if(this.grimCount < 1){
-            this.game.addEntity(new Grim(this.game, 1300,-100));
+            this.game.addEntity(new Grim(this.game, 1400,-100));
             this.grimCount++;
         }
     }
     update() {
+        if(this.gameOver){
+            this.clearEntities();
+            this.game.addEntity(new Win(this.game));
+            
+        }
         if(this.score >= this.bossScore){
             this.bossSwitchTime += this.game.clockTick;
             this.GrimSpawn();
@@ -136,15 +149,13 @@ class SceneManager{
                 ctx.drawImage(this.spriteSheet,0,0,32,32,0+32*i,0,48,48)
             }
             
-
             this.scoreTime += this.game.clockTick;
-         //   console.log(this.scoreTime);
-            //this.score = this.game.clockTick;
-            ctx.font =  '60px "a"'
-            ctx.fillStyle = "RED";
-            this.score = Math.floor(this.scoreTime);
-            ctx.fillText("SCORE:"+this.score+" ", 1000 ,100);
-
+            if(this.score <= this.bossScore){
+                ctx.font =  '60px "a"'
+                ctx.fillStyle = "RED";
+                this.score = Math.floor(this.scoreTime);
+                ctx.fillText("SCORE:"+this.score+" ", 1000 ,100);
+            }
 
         }
 

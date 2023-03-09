@@ -46,7 +46,6 @@ class AssetManager {
                 case "wav":
                 case "mp3":
                     const aud = new Audio();
-
                     aud.addEventListener("loadeddata", () => {
                         console.log("Loaded " + aud.src);
                         this.successCount++;
@@ -63,6 +62,12 @@ class AssetManager {
                         aud.pause();
                         aud.currentTime = 0;
                     });
+
+                    if( path == "./assets/level1.mp3"){
+                        aud.volume = 0.02;
+                    }else{
+                        aud.volume = 0.1;
+                    }
 
                     aud.src = path;
                     aud.load();
