@@ -185,7 +185,7 @@ class CharacterController {
 
             };
 
-            if(this.game.keys["w"] && this.state != "ROLL"){
+            if(this.game.keys["Space"] && this.state != "ROLL"){
                 if(this.state != "JUMP" ){
                     if(!this.game.mute){
                         this.runSound.pause();

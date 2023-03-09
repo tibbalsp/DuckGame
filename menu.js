@@ -126,7 +126,7 @@ class Menu{
         ctx.font =  '24px ""';
         ctx.fillText(" A  "+'\u2192'+" Move Left", 270,350);
         ctx.fillText(" D  " +'\u2192'+" Move Right", 270,400);
-        ctx.fillText(" W " +'\u2192' +" Jump - Hold to fall slower", 270,450);
+        ctx.fillText(" Space " +'\u2192' +" Jump - Hold to fall slower", 270,450);
 
         ctx.fillText(" S  "+'\u2192'+" Roll", 270,500);
         ctx.fillText(" S  "+'\u2192'+" Hold when airborne to fall faster", 270,550);
