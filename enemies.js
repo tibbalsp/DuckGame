@@ -5,7 +5,7 @@ class Tombstone {
         this.y=y;
         this.velocity = { x: 0, y:0};
         this.spritesheet = ASSET_MANAGER.getAsset("./assets/Headstone.png");
-        this.speed = -5;
+        this.speed = -5*60;
         this.updateBB();
 
     }
@@ -18,7 +18,7 @@ class Tombstone {
         if(this.x < -200){
             this.removeFromWorld = true;
         }
-        this.x += this.speed;
+        this.x += this.speed*this.game.clockTick;
     
         this.updateBB();
 
@@ -42,7 +42,7 @@ class Dog{
         this.x=x;
         this.y=y;
         this.spritesheet = ASSET_MANAGER.getAsset("./assets/dog.png");
-        this.speed = 0.5;
+        this.speed = 0.5*60;
         this.updateBB();
         this.animation = new Animator(this.spritesheet,0,0,52,38,3,0.2,1,0,0,0,2);
         this.updateScore=0;
@@ -59,7 +59,7 @@ class Dog{
         }
     }
     updateSpeed(){
-        this.speed = -7.5;
+        this.speed = -7.5*60;
     }
     update(){
         if(this.x >2000){
@@ -67,7 +67,7 @@ class Dog{
             this.removeFromWorld = true;
         }
         
-        this.x += this.speed;
+        this.x += this.speed*this.game.clockTick;
         //console.log(this.x);
 
         this.updateBB();
@@ -228,7 +228,6 @@ class Grim{
                 this.dir = 1;
             }
         }else{
-            console.log(                this.attackTime     )
             if(this.attack && this.attackTime < this.elapsedFireball){
                 if(Math.floor(this.y) == 515){
                     if(this.facingDirection == 0){
@@ -370,7 +369,7 @@ class FireBall{
         this.fireSheet = ASSET_MANAGER.getAsset("./assets/fireball.png");
         this.fireAnimation = new Animator(this.fireSheet,0,0,510,512,6,0.2,1,0,0,0,0.25);
         this.side = 0;
-        this.speed = 5;
+        this.speed = 5*60;
         this.facingDirection = direction;
 
     }
@@ -381,9 +380,9 @@ class FireBall{
         }
         if(this.facingDirection == 0){
 
-            this.x -= this.speed;
+            this.x -= this.speed*this.game.clockTick;
         }else{
-            this.x += this.speed;
+            this.x += this.speed*this.game.clockTick;
 
         }
       

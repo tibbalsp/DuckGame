@@ -12,7 +12,7 @@ class CharacterController {
         this.y=500;
 
         this.speed = 800;
-        this.jumpSpeed = 1000;
+        this.jumpSpeed = 350;
         this.velocity = { x: 0, y: 0 };
         this.gravity =  600;
         this.fallAcc = this.gravity;
@@ -82,8 +82,6 @@ class CharacterController {
 
     updateBB(frame){
         this.lastBB = this.BB;
-        
-
         if(this.state =="WALK" || this.state == "IDLE"|| this.state == "JUMP"){
            
             this.BB = new BoundingBox(this.x+42 , this.y+8 , 52, 66*1.7);
@@ -192,16 +190,16 @@ class CharacterController {
                     }
                     this.state = "JUMP";
                     this.fallAcc = this.gravity;
-                    this.velocity.y -= this.jumpSpeed*20*this.game.clockTick;
-                }else{
-                    this.hover = true;
-                }
+                    this.velocity.y -= this.jumpSpeed;
+
+                }                    
+                this.hover = true;
             };
 
 
             if(this.game.keys["s"]  && this.state != "ROLL"){
                 if(this.state == "JUMP"){
-                    this.velocity.y +=15;
+                   // this.velocity.y +=15*this.game.clockTick;
                 }else{
                     this.state = "ROLL";
                     if(!this.game.mute){
@@ -281,13 +279,20 @@ class CharacterController {
             }else{
                 this.fallAcc = FALL;
             }
+            
+            
+            console.log(    this.fallAcc+            "falling"    )
 
-            this.velocity.y += this.fallAcc * this.game.clockTick;
-           // console.log(this.velocity.y+"   "+this.preVeloY)
+            this.velocity.y += this.fallAcc*this.game.clockTick;
             this.y += this.velocity.y*this.game.clockTick;
+
+            console.log(    this.fallAcc+            "falling"    )
+
+
 
             this.updateBB();
          //   console.log(this.state);
+   
 
             //Collisions
             var that = this;

@@ -10,7 +10,7 @@ class Background{
     update(){
         //to move as auto scrolling
         if(!this.halt){
-            this.x -= 5;
+            this.x -= 300*this.game.clockTick;
             if (this.x < 0 - 1919) {
                 this.x = 0
             };
