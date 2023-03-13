@@ -165,11 +165,19 @@ class Grim{
             this.maxHealth = 100;
 
         }
+        this.fireSound = ASSET_MANAGER.getAsset("./assets/fireball.mp3");
 
     }
 
     spawnFireBall(x,y,dir){
         this.game.addEntity(new FireBall(this.game,x,y,dir));
+        this.fireSound.volume = 0.002;
+        if(!this.game.mute){
+            this.fireSound.cloneNode(true).play();
+        }
+        this.fireSound.volume = 0.002;
+
+
     }
     switchSide(){
         if(this.attack){
@@ -231,7 +239,7 @@ class Grim{
             if(this.attack && this.attackTime < this.elapsedFireball){
                 if(Math.floor(this.y) == 515){
                     if(this.facingDirection == 0){
-                        this.spawnFireBall(this.x-510,this.y,0);
+                        this.spawnFireBall(this.x-510 , this.y , 0);
                     }else{
                         this.spawnFireBall(this.x,this.y,1);
                     }
@@ -254,7 +262,6 @@ class Grim{
                     this.elapsedFireball = 0;
 
                 }
-
             }
             if(this.y < 500){
                 this.dir = 1;
@@ -263,6 +270,8 @@ class Grim{
     
         if(this.y > 630){
             if(this.startingFlag== true){
+                this.game.backrough
+                this.game.grimSpawnMusic.pause();
                 this.verticalSpeed = 50;
                 this.startingFlag=false;
                 this.attack = true;
@@ -334,8 +343,8 @@ class Grim{
         this.animation.drawFrame(this.game.clockTick, ctx, destx, desty);
         ctx.restore();
         ctx.save();
-        const width = this.BB.width | 1.5*this.maxHealth; // provide a default/standardized bar size.
-        const ratio = this.health / this.maxHealth;
+        let width = this.BB.width | 1*this.maxHealth; // provide a default/standardized bar size.
+        let ratio = this.health / this.maxHealth;
 
         if (!this.facingDirection) {// if facing right
             ctx.fillStyle="black"; // black background for empty health.
@@ -372,10 +381,17 @@ class FireBall{
         this.speed = 5*60;
         this.facingDirection = direction;
 
+        this.justFired = false;
+
+
     }
     update(){
-
-        if(this.x < -800|| this.x > 2000){
+        if(!this.justFired){
+            this.justFired = true;
+            console.log(this.justFired+" fire sound started")
+        }
+        if(this.x < -800 || this.x > 2000){
+            
             this.removeFromWorld = true;
         }
         if(this.facingDirection == 0){

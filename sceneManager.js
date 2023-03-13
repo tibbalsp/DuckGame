@@ -6,13 +6,13 @@ class SceneManager{
         this.game.camera = this;
         this.game.difficulty = difficulty;
         this.x = 0;
-        this.score = 0;
+        this.score = 200;
 
         this.player = new CharacterController(this.game,50,550);
        
         this.elapsedGraveTime = 0;
         this.elapsedDogTime = 0;
-        this.scoreTime = 0;
+        this.scoreTime = 200;
 
         this.graveSpawns = [0.5,1,3,5];
         this.dogSpawns =[5,7,11];
@@ -22,11 +22,12 @@ class SceneManager{
         this.GraveSpawn();
         this.DogSpawn();
         this.loadLevel(50,550);
-        this.game.bgm = null;
         this.dogCount = 0;
         this.grimCount = 0;
         this.spriteSheet = ASSET_MANAGER.getAsset("./assets/Duck Sprite Sheet.png");
         this.bossScore = 0;
+        this.game.grimSpawnMusic = ASSET_MANAGER.getAsset("./assets/bossSpawn.mp3");
+        ASSET_MANAGER.autoRepeat("./assets/bossSpawn.mp3")
         this.gameOver = false;
         
         if(difficulty == "EASY"){
@@ -49,15 +50,7 @@ class SceneManager{
         this.player.x = x;
         this.player.y = y;
         this.player.velocity = { x: 0, y: 0 };
-        if(this.game.bgm == null){
-            this.game.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
-            ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
-            if(!this.game.mute){
-                this.game.bgm.play();
-            }else{
-                this.game.bgm.pause();
-            }
-        }
+      
        //this.player = (new CharacterController(gameEngine),50,550)
 
        this.game.addEntity(this.player);
@@ -98,6 +91,11 @@ class SceneManager{
     };
     GrimSpawn(){
         if(this.grimCount < 1){
+            if(!this.game.mute){
+                this.game.grimSpawnMusic.play();
+            }else{
+                this.game.grimSpawnMusic.pause();
+            }
             this.game.addEntity(new Grim(this.game, 1400,-100));
             this.grimCount++;
         }
@@ -111,7 +109,7 @@ class SceneManager{
         if(this.score >= this.bossScore){
             this.bossSwitchTime += this.game.clockTick;
             this.GrimSpawn();
-            if(this.bossSwitchTime > 10){
+            if(this.bossSwitchTime > 5){
                 this.game.background.updateSpeed(true);
 
             }

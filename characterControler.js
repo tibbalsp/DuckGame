@@ -12,9 +12,9 @@ class CharacterController {
         this.y=500;
 
         this.speed = 800;
-        this.jumpSpeed = 350;
+        this.jumpSpeed = 400;
         this.velocity = { x: 0, y: 0 };
-        this.gravity =  600;
+        this.gravity =  800;
         this.fallAcc = this.gravity;
         this.hover = false;
 
@@ -75,6 +75,11 @@ class CharacterController {
         ASSET_MANAGER.autoRepeat("./assets/running.mp3")
         this.rollSound = ASSET_MANAGER.getAsset("./assets/roll.mp3")
         ASSET_MANAGER.autoRepeat("./assets/roll.mp3")
+        this.flySound = ASSET_MANAGER.getAsset("./assets/wingflap.mp3")
+        ASSET_MANAGER.autoRepeat("./assets/wingflap.mp3")
+        this.quackSound = ASSET_MANAGER.getAsset("./assets/quack.mp3")
+        ASSET_MANAGER.autoRepeat("./assets/quack.mp3")
+
 
         this.animationList = this.regularList;
 
@@ -99,260 +104,308 @@ class CharacterController {
     switchAnimation(){
         if(this.animationList == this.damagedList){
             console.log("switched to reg")
-
+            if(!this.game.mute){
+                this.quackSound.pause();
+            }
             this.animationList = this.regularList;
         }else{
             console.log("switched to flash")
-
+            if(this.damaged == false){
+                if(!this.game.mute){
+                    this.quackSound.play();
+                }
+            }
             this.animationList = this.damagedList;
         }
     }
+    muteAll(){
+        if(this.game.bgm != null){
+            this.game.bgm.pause();
+        }
+        if(this.game.grimSpawnMusic != null){
+            this.game.grimSpawnMusic.pause();
+        }
+        this.runSound.pause(); 
+        this.rollSound.pause(); 
+        this.flySound.pause(); 
+        this.quackSound.pause(); 
+    }
     update(){
-        this.runSound.volume = 0.07;
-        this.rollSound.volume = 0.07;
+
+        this.runSound.volume = 0.2;
+        this.flySound.volume = 0.2;
+        this.rollSound.volume = 0.05;
         this.preVeloY = this.velocity.y;   
         const FALL = 1575;
-        const MAXRUN = 400;
+        const MAXRUN = 550;
         
         this.hover = false;
 
         if(this.game.keys["Escape"]){
             this.game.camera.clearEntities();
+            this.muteAll();
             this.removeFromWorld = true;
-            if( this.game.bgm != null){
-                this.game.bgm.pause();
-            }
             this.game.addEntity(new Menu(this.game));        
-        }        
+        }else{        
 
-        if(this.damaged){
-            this.damageTimeout += this.game.clockTick;
-            if(this.damageTimeout > 3){
-                this.damaged = false;
-                this.switchAnimation();
+            if(this.damaged){
+                this.damageTimeout += this.game.clockTick;
+                if(this.damageTimeout > 3){
+                    this.damaged = false;
+                    this.switchAnimation();
+                }
             }
-        }
-       
-        if(this.lives < 0){
-            this.dead = true;
-        }else{
+        
+            if(this.lives < 0){
+                this.dead = true;
+            }else{
 
-            if(this.game.camera.bossSwitchTime >= 10){
-                this.stoppedBackground = true;
-            }
+                if(this.game.camera.bossSwitchTime >= 10){
+                    this.stoppedBackground = true;
+                }
+        
+
+                if(this.y > 560) {
+                    this.fallAcc = this.gravity;
+                    if(this.state=="JUMP"){
+                        if(this.stoppedBackground && !this.game.keys["d"] && !this.game.keys["a"]){
+                            this.state = "IDLE";
+                            this.velocity.x = 0;
+                            if(!this.game.mute){
+                                this.flySound.pause();
+                            }else{
+                                this.flySound.pause();
+                            }
+                        }else{
+                            this.state="WALK";
+                            if(!this.game.mute){
+                                this.flySound.pause();
+                                this.runSound.play();
+                            }else{
+                                this.flySound.pause();
+                                this.runSound.pause();
+                            }
+                        }
+                        
+                    }
+                    this.y=560;
+                    this.velocity.y = 0;
+                    //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
+                    
+                    if(this.stoppedBackground && this.state=="WALK" && !this.game.keys["d"] && !this.game.keys["a"]){
+                        this.state ="IDLE";
+                        this.velocity.x = 0;
+                        if(!this.game.mute){
+                            this.runSound.pause();
+                        }else{
+                            this.runSound.pause();
+                        }
+
+                    }
+
+
+                    if(!this.game.keys["s"]){
+                        if(!this.game.mute){
+                            this.rollSound.pause();
+                        }else{
+                            this.rollSound.pause();
+                        }
+                        
+                        this.elapsedTime = 0
+                        if(this.stoppedBackground && this.state !="WALK"){
+                            this.state = "IDLE";
+
+                        }else{
+                            this.state="WALK";
+                            if(!this.game.mute){
+                                this.runSound.play();
+                            }else{
+                                this.runSound.pause();
+                            }                
+                        }
+                    }
+
+                };
+
+                if(this.game.keys["Space"] && this.state != "ROLL"){
+                    if(this.state != "JUMP" ){
+                        if(!this.game.mute){
+                            this.runSound.pause();
+                            this.flySound.play();
+                        }else{
+                            this.runSound.pause();
+                            this.flySound.pause();
+                        } 
+                        this.state = "JUMP";
+                        this.fallAcc = this.gravity;
+                        this.velocity.y -= this.jumpSpeed;
+
+                    }                    
+                    this.hover = true;
+                };
+
+
+                if(this.game.keys["s"]  && this.state != "ROLL"){
+                    if(this.state == "JUMP"){
+                    // this.velocity.y +=15*this.game.clockTick;
+                    }else{
+                        this.state = "ROLL";
+                        if(!this.game.mute){
+                            this.runSound.pause();
+                            this.rollSound.play();
+                        }else{
+                            this.runSound.pause();
+                            this.rollSound.pause();
+                        } 
+                        
+                    }
+
+
+                };
+                
+
+                if(this.game.keys["d"]){
+                    if(this.stoppedBackground){
+                        this.facingDirection = 1;
+                        if(this.state == "IDLE"){
+                            this.state = "WALK"
+                            if(!this.game.mute){
+                                this.runSound.play();
+                            }else{
+                                this.runSound.pause();
+                            } 
+                        }
+                    }
+                    
+                    
+                    if(this.velocity.x < 0){
+                        this.velocity.x = 0
+                    }
+                    if(this.velocity.x > MAXRUN){
+                        this.velocity.x = MAXRUN;
+                    }else{
+                        this.velocity.x += this.speed*this.game.clockTick;
+                    }
+                    
+                }else if(this.game.keys["a"]){
+                    if(this.stoppedBackground){
+                        this.facingDirection = 0;
+                        if(this.state == "IDLE"){
+                            this.state = "WALK"
+                            if(!this.game.mute){
+                                this.runSound.play();
+                            }else{
+                                this.runSound.pause();
+                            } 
+
+                        }
+                    }
+                    if(this.velocity.x > 0){
+                        this.velocity.x = 0
+                    }
+                    if(this.velocity.x < -MAXRUN){
+                        this.velocity.x = -MAXRUN;
+                    }else{
+                        this.velocity.x -= this.speed*this.game.clockTick;
+                    }
+                }  
+
+                
+                
+                if(this.x<10){
+                    this.x = 10
+                    this.velocity.x = 0;
+                }else if(this.x > 1325){
+                    this.x = 1325;
+                    this.velocity.x = 0;
+                }else{
+            
+                }
+                this.updateBB();
+
+                this.x += this.velocity.x*this.game.clockTick;
+
+                if (this.velocity.y < -100 && this.preVeloY <= -100) { // jump
+                    this.hover = true;
+                }
+
+                if(this.hover){
+                    this.fallAcc = this.gravity;
+                }else{
+                    this.fallAcc = FALL;
+                }
+                
+                
+
+                this.velocity.y += this.fallAcc*this.game.clockTick;
+                this.y += this.velocity.y*this.game.clockTick;
+
+
+
+
+                this.updateBB();
+            //   console.log(this.state);
     
 
-            if(this.y > 560) {
-                this.fallAcc = this.gravity;
-                if(this.state=="JUMP"){
-                    if(this.stoppedBackground && !this.game.keys["d"] && !this.game.keys["a"]){
-                        this.state = "IDLE";
-                        this.velocity.x = 0;
-                    }else{
-                        this.state="WALK";
-                        if(!this.game.mute){
-                            this.runSound.play();
-                        }
-                    }
-                }
-                this.y=560;
-                this.velocity.y = 0;
-                //this.animationList["JUMP"] = new Animator(ASSET_MANAGER.getAsset("./duckies.png"),0,290,72,70,5,0.2,0);
-                
-                if(this.stoppedBackground && this.state=="WALK" && !this.game.keys["d"] && !this.game.keys["a"]){
-                    this.state ="IDLE";
-                    this.velocity.x = 0;
-                }
-
-
-                if(!this.game.keys["s"]){
-                    if(!this.game.mute){
-                        this.rollSound.pause();
-                    }
-                    
-                    this.elapsedTime = 0
-                    if(this.stoppedBackground && this.state !="WALK"){
-                        this.state = "IDLE";
-
-                    }else{
-                        this.state="WALK";
-                        if(!this.game.mute){
-                            this.runSound.play();
-                        }                    }
-                }
-
-            };
-
-            if(this.game.keys["Space"] && this.state != "ROLL"){
-                if(this.state != "JUMP" ){
-                    if(!this.game.mute){
-                        this.runSound.pause();
-                    }
-                    this.state = "JUMP";
-                    this.fallAcc = this.gravity;
-                    this.velocity.y -= this.jumpSpeed;
-
-                }                    
-                this.hover = true;
-            };
-
-
-            if(this.game.keys["s"]  && this.state != "ROLL"){
-                if(this.state == "JUMP"){
-                   // this.velocity.y +=15*this.game.clockTick;
-                }else{
-                    this.state = "ROLL";
-                    if(!this.game.mute){
-                        this.runSound.pause();
-                        this.rollSound.play();
-                    }
-                    
-                }
-
-
-            };
-            
-
-            if(this.game.keys["d"]){
-                if(this.stoppedBackground){
-                    this.facingDirection = 1;
-                    if(this.state == "IDLE"){
-                        this.state = "WALK"
-                        if(!this.game.mute){
-                            this.runSound.play();
-                        }
-                    }
-                }
-                
-                
-                if(this.velocity.x < 0){
-                    this.velocity.x = 0
-                }
-                if(this.velocity.x > MAXRUN){
-                    this.velocity.x = MAXRUN;
-                }else{
-                    this.velocity.x += this.speed*this.game.clockTick;
-                }
-                
-            }else if(this.game.keys["a"]){
-                if(this.stoppedBackground){
-                    this.facingDirection = 0;
-                    if(this.state == "IDLE"){
-                        this.state = "WALK"
-                        if(!this.game.mute){
-                            this.runSound.play();
-                        }
-
-                    }
-                }
-                if(this.velocity.x > 0){
-                    this.velocity.x = 0
-                }
-                if(this.velocity.x < -MAXRUN){
-                    this.velocity.x = -MAXRUN;
-                }else{
-                    this.velocity.x -= this.speed*this.game.clockTick;
-                }
-            }  
-
-            
-            
-            if(this.x<10){
-                this.x = 10
-                this.velocity.x = 0;
-            }else if(this.x > 1325){
-                this.x = 1325;
-                this.velocity.x = 0;
-            }else{
-        
-            }
-            this.updateBB();
-
-            this.x += this.velocity.x*this.game.clockTick;
-
-            if (this.velocity.y < 0 && this.preVeloY <= 0) { // jump
-                this.hover = true;
-            }
-
-            if(this.hover){
-                this.fallAcc = this.gravity;
-            }else{
-                this.fallAcc = FALL;
-            }
-            
-            
-            console.log(    this.fallAcc+            "falling"    )
-
-            this.velocity.y += this.fallAcc*this.game.clockTick;
-            this.y += this.velocity.y*this.game.clockTick;
-
-            console.log(    this.fallAcc+            "falling"    )
-
-
-
-            this.updateBB();
-         //   console.log(this.state);
-   
-
-            //Collisions
-            var that = this;
-            this.game.entities.forEach(function (entity) {    
-                if(that != entity && that.damaged==false && entity.BB && that.BB.collide(entity.BB)){
-                        
-                        if(entity instanceof Tombstone){
-                            console.log("tombstone")
-                            that.switchAnimation();
-                            that.damaged = true;
-                            that.lives -= 1;
-                            that.damageTimeout = 0;
-                        }
-                        if(entity instanceof Dog && that.state != "ROLL"){
-                            console.log("dog")
-                            that.switchAnimation();
-                            that.damaged = true;
-                            that.lives -= 1;
-                            that.damageTimeout = 0;
+                //Collisions
+                var that = this;
+                this.game.entities.forEach(function (entity) {    
+                    if(that != entity && that.damaged==false && entity.BB && that.BB.collide(entity.BB)){
                             
-                        }
-                        if(entity instanceof Grim ){
-                            console.log("grim")
-                            if(entity.damaged==1 && !that.damaged){
-                                that.switchAnimation();
-                                that.damaged = true;
-                                that.lives -= 1;
-                                that.damageTimeout = 0;
-                            }else if(that.lastBB.bottom < entity.BB.top && entity.damaged==0){
-                                that.velocity.y -= 250;
-                                that.y -=150;
-
-                            }else if(that.state == "ROLL" && entity.damaged == 0){
-                                if(that.lastBB.right < entity.lastBB.left){
-                                    that.x -=20;
-                                }else  if(that.lastBB.left > entity.lastBB.right){
-                                    that.x +=20;
-                                    
-                                }
-
-                            }else{
+                            if(entity instanceof Tombstone){
+                                console.log("tombstone")
                                 that.switchAnimation();
                                 that.damaged = true;
                                 that.lives -= 1;
                                 that.damageTimeout = 0;
                             }
-                    
-                        }
-                        if(entity instanceof FireBall){
-                           that.switchAnimation();
-                           that.damaged = true;
-                           that.lives -= 1;
-                           that.damageTimeout = 0;
-                        }
-                    
-                
-                }
-            })
-        }
+                            if(entity instanceof Dog && that.state != "ROLL"){
+                                console.log("dog")
+                                that.switchAnimation();
+                                that.damaged = true;
+                                that.lives -= 1;
+                                that.damageTimeout = 0;
+                                
+                            }
+                            if(entity instanceof Grim ){
+                                console.log("grim")
+                                if(entity.damaged==1 && !that.damaged){
+                                    that.switchAnimation();
+                                    that.damaged = true;
+                                    that.lives -= 1;
+                                    that.damageTimeout = 0;
+                                }else if(that.lastBB.bottom < entity.BB.top && entity.damaged==0){
+                                    that.velocity.y -= 250;
+                                    that.y -=150;
 
+                                }else if(that.state == "ROLL" && entity.damaged == 0){
+                                    if(that.lastBB.right < entity.lastBB.left){
+                                        that.x -=20;
+                                    }else  if(that.lastBB.left > entity.lastBB.right){
+                                        that.x +=20;
+                                        
+                                    }
+
+                                }else{
+                                    that.switchAnimation();
+                                    that.damaged = true;
+                                    that.lives -= 1;
+                                    that.damageTimeout = 0;
+                                }
+                        
+                            }
+                            if(entity instanceof FireBall){
+                            that.switchAnimation();
+                            that.damaged = true;
+                            that.lives -= 1;
+                            that.damageTimeout = 0;
+                            }
+                        
+                    
+                    }
+                })
+            }
+        }
     };
 
 

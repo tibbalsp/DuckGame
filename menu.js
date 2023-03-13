@@ -12,14 +12,29 @@ class Menu{
         this.grimDeath = ASSET_MANAGER.getAsset("./assets/reaperDamaged.png");
         this.grimDeathAnimation = new Animator(this.grimDeath,0,0,32,31,6,0.1,1,0,0,0,1);
 
+        this.game.bgm = ASSET_MANAGER.getAsset("./assets/level1.mp3");
+        ASSET_MANAGER.autoRepeat("./assets/level1.mp3");
+
         this.difficulty = "";
         this.game.mute = false;            
         this.game.debug = false;            
 
     };
 
+    muteUnmute(){
+        if(!this.game.mute){
+            this.game.bgm.play();
+        }else{
+            this.game.bgm.pause();
+        }
+    }
+
     update(){
         //Play button
+        
+        this.muteUnmute();
+
+
         if(this.game.click && this.game.click.y > 160 && this.game.click.y < 200 && this.game.click.x > 625 && this.game.click.x <720){
             this.game.click.y = 0;
             this.removeFromWorld = true;
@@ -52,6 +67,7 @@ class Menu{
             }else{
                 this.game.mute = true;            
             }
+            this.muteUnmute();
             this.game.click = false;        
         }
         if(this.game.click && this.game.click.y > 160 && this.game.click.y < 190 &&this.game.click.x > 380 && this.game.click.x < 410){
@@ -67,6 +83,8 @@ class Menu{
             this.removeFromWorld = true;
             this.game.addEntity(new SceneManager(this.game,"ENDLESS"));
         }
+
+        
     }
   
     

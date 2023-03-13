@@ -15,7 +15,10 @@ class RetryMenu{
             this.game.background.halt = false;
             this.game.addEntity(new SceneManager(this.game, this.game.difficulty)); 
         }
-    
+
+        if(!this.game.mute){
+        }else{
+        }
     };
     
     draw(ctx){ 
