@@ -6,13 +6,13 @@ class SceneManager{
         this.game.camera = this;
         this.game.difficulty = difficulty;
         this.x = 0;
-        this.score = 200;
+        this.score = 0;
 
         this.player = new CharacterController(this.game,50,550);
        
         this.elapsedGraveTime = 0;
         this.elapsedDogTime = 0;
-        this.scoreTime = 200;
+        this.scoreTime = 0;
 
         this.graveSpawns = [0.5,1,3,5];
         this.dogSpawns =[5,7,11];
